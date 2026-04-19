@@ -2,19 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>CASIO</title>
-
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#04070B">
-  <meta name="mobile-web-app-capable" content="yes">
-
-  <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png">
-  <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png">
-
-  <link href="https://fonts.googleapis.com/css?family=Orbitron:400,700,900|Share+Tech+Mono" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Iconia Clock</title>
+  <meta name="theme-color" content="#030508">
 
   <style>
     * { margin:0; padding:0; -webkit-box-sizing:border-box; box-sizing:border-box; }
@@ -23,35 +13,16 @@
       width:100%;
       height:100%;
       overflow:hidden;
-    }
-
-    body {
       background:#030508;
-      font-family:'Share Tech Mono', monospace;
-      -webkit-tap-highlight-color:transparent;
+      font-family:Arial, sans-serif;
       -webkit-user-select:none;
       user-select:none;
-      -webkit-transition:background 1s;
-      transition:background 1s;
     }
 
     body.day { background:#091018; }
     body.night { background:#030508; }
 
-    #statusbar-cover {
-      position:fixed;
-      top:0; left:0; right:0;
-      height:24px;
-      z-index:9999;
-      pointer-events:none;
-      -webkit-transition:background 1s;
-      transition:background 1s;
-    }
-
-    body.day #statusbar-cover { background:#091018; }
-    body.night #statusbar-cover { background:#030508; }
-
-    .screen {
+    #app {
       position:relative;
       width:100vw;
       height:100vh;
@@ -60,22 +31,13 @@
 
     .floating {
       position:absolute;
-      -webkit-transition:
-        left 2.2s ease,
-        top 2.2s ease,
-        opacity 1s ease,
-        color 1s ease,
-        text-shadow 1s ease;
-      transition:
-        left 2.2s ease,
-        top 2.2s ease,
-        opacity 1s ease,
-        color 1s ease,
-        text-shadow 1s ease;
       white-space:nowrap;
+      -webkit-transition:left 2s ease, top 2s ease, opacity 1s ease, color 1s ease;
+      transition:left 2s ease, top 2s ease, opacity 1s ease, color 1s ease;
+      -webkit-transform:translate(-50%,-50%);
+      transform:translate(-50%,-50%);
     }
 
-    /* BLOQUE HORA + FECHA */
     #clock-group {
       z-index:3;
       text-align:center;
@@ -83,59 +45,47 @@
     }
 
     #time {
-      font-family:'Orbitron', monospace;
-      font-weight:700;
-      font-size:22vw;
+      font-family:monospace;
+      font-weight:bold;
+      font-size:20vw;
       line-height:0.9;
-      letter-spacing:-0.03em;
+      letter-spacing:-2px;
     }
-
-    .sep {
-      display:inline-block;
-      opacity:0.55;
-      -webkit-animation:softblink 2.6s infinite;
-      animation:softblink 2.6s infinite;
-    }
-
-    @-webkit-keyframes softblink { 0%,100%{opacity:0.55} 50%{opacity:0.25} }
-    @keyframes softblink { 0%,100%{opacity:0.55} 50%{opacity:0.25} }
 
     #seconds {
-      margin-top:8px;
+      margin-top:4px;
       text-align:right;
-      font-family:'Orbitron', monospace;
-      font-weight:700;
-      font-size:20px;
-      letter-spacing:3px;
+      font-family:monospace;
+      font-weight:bold;
+      font-size:18px;
+      letter-spacing:2px;
       opacity:0.7;
     }
 
     #date-text {
-      margin-top:10px;
-      font-family:'Orbitron', monospace;
-      font-weight:700;
-      font-size:20px;
+      margin-top:8px;
+      font-family:monospace;
+      font-weight:bold;
+      font-size:18px;
       line-height:1.2;
-      letter-spacing:1px;
       text-align:center;
       white-space:nowrap;
     }
 
-    /* TEMPERATURA */
     #temp-wrap {
       z-index:2;
       text-align:center;
     }
 
     #temp-value {
-      font-family:'Orbitron', monospace;
-      font-weight:700;
-      font-size:60px;
+      font-family:monospace;
+      font-weight:bold;
+      font-size:46px;
       line-height:1;
     }
 
     #temp-label {
-      margin-top:6px;
+      margin-top:4px;
       font-size:11px;
       letter-spacing:2px;
       opacity:0.75;
@@ -145,7 +95,6 @@
     body.day #date-text,
     body.day #temp-value {
       color:#6EB7DA;
-      text-shadow:0 0 10px rgba(110,183,218,0.18);
     }
 
     body.day #seconds,
@@ -156,19 +105,17 @@
     body.night #time,
     body.night #date-text,
     body.night #temp-value {
-      color:#234A67;
-      text-shadow:0 0 6px rgba(35,74,103,0.12);
+      color:#2C5673;
     }
 
     body.night #seconds,
     body.night #temp-label {
-      color:#193140;
+      color:#1B3444;
     }
 
     .rest-mode #time,
     .rest-mode #date-text,
     .rest-mode #temp-value {
-      text-shadow:none !important;
       opacity:0.78;
     }
 
@@ -176,21 +123,12 @@
     .rest-mode #temp-label {
       opacity:0.38;
     }
-
-    @media screen and (max-width:480px) {
-      #time { font-size:23vw; }
-      #date-text { font-size:17px; }
-      #temp-value { font-size:52px; }
-      #seconds { font-size:16px; }
-    }
   </style>
 </head>
 <body class="night">
-  <div id="statusbar-cover"></div>
-
-  <div class="screen" id="screen">
+  <div id="app">
     <div class="floating" id="clock-group">
-      <div id="time">00<span class="sep">:</span>00</div>
+      <div id="time">00:00</div>
       <div id="seconds">00</div>
       <div id="date-text">Sábado, 18 de abril de 2026</div>
     </div>
@@ -208,35 +146,25 @@
     var DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
     var MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
-    var modeOverride = 'auto';
-
-    function pad(n) { return n < 10 ? '0' + n : n; }
+    function pad(n) {
+      return n < 10 ? '0' + n : '' + n;
+    }
 
     function randomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function applyMode(m) {
-      document.body.className = m;
-      updateRestMode();
-    }
-
-    function checkMode() {
-      if (modeOverride !== 'auto') {
-        applyMode(modeOverride);
-        return;
-      }
+    function setMode() {
       var h = new Date().getHours();
-      applyMode((h >= 20 || h < 7) ? 'night' : 'day');
+      document.body.className = (h >= 20 || h < 7) ? 'night' : 'day';
+      if (h >= 1 && h < 6) {
+        document.body.className += ' rest-mode';
+      }
     }
-
-    checkMode();
-    setInterval(checkMode, 30000);
 
     function updateClock() {
       var now = new Date();
-      document.getElementById('time').innerHTML =
-        pad(now.getHours()) + '<span class="sep">:</span>' + pad(now.getMinutes());
+      document.getElementById('time').innerHTML = pad(now.getHours()) + ':' + pad(now.getMinutes());
       document.getElementById('seconds').innerHTML = pad(now.getSeconds());
     }
 
@@ -245,11 +173,6 @@
       var texto = DIAS[now.getDay()] + ', ' + now.getDate() + ' de ' + MESES[now.getMonth()] + ' de ' + now.getFullYear();
       document.getElementById('date-text').innerHTML = texto;
     }
-
-    updateClock();
-    updateDate();
-    setInterval(updateClock, 1000);
-    setInterval(updateDate, 60000);
 
     function loadWeather() {
       var url = 'https://api.open-meteo.com/v1/forecast' +
@@ -264,87 +187,55 @@
 
       xhr.onreadystatechange = function() {
         if (xhr.readyState !== 4) return;
-
-        if (xhr.status !== 200) {
-          setTimeout(loadWeather, 30000);
-          return;
-        }
+        if (xhr.status !== 200) return;
 
         try {
           var data = JSON.parse(xhr.responseText);
-          var c = data.current;
-          document.getElementById('temp-value').innerHTML = Math.round(c.temperature_2m) + '°';
-        } catch(e) {}
-      };
-
-      xhr.onerror = function() {
-        setTimeout(loadWeather, 60000);
+          document.getElementById('temp-value').innerHTML =
+            Math.round(data.current.temperature_2m) + '°';
+        } catch (e) {}
       };
 
       xhr.send();
     }
 
-    loadWeather();
-    setInterval(loadWeather, 600000);
-
-    function updateRestMode() {
-      var h = new Date().getHours();
-      var body = document.body;
-      body.className = body.className.replace(/\brest-mode\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
-      if (h >= 1 && h < 6) {
-        body.className += ' rest-mode';
-      }
-    }
-
-    updateRestMode();
-    setInterval(updateRestMode, 60000);
-
-    /* =========================
-       MOVIMIENTO CON MÁRGENES SEGUROS
-       ========================= */
-
-    var lastClockZone = -1;
-    var lastTempZone = -1;
-
-    /* Hora+fecha: solo zona central segura */
     var clockZones = [
-      { cx:50, cy:28 },
+      { cx:50, cy:30 },
       { cx:50, cy:38 },
-      { cx:50, cy:48 },
-      { cx:42, cy:34 },
-      { cx:58, cy:34 },
+      { cx:50, cy:46 },
+      { cx:42, cy:38 },
+      { cx:58, cy:38 },
       { cx:42, cy:46 },
       { cx:58, cy:46 }
     ];
 
-    /* Temperatura: laterales y parte baja/alta, sin centro */
     var tempZones = [
       { cx:16, cy:18 },
       { cx:84, cy:18 },
-      { cx:16, cy:50 },
-      { cx:84, cy:50 },
-      { cx:18, cy:80 },
-      { cx:82, cy:80 },
+      { cx:16, cy:52 },
+      { cx:84, cy:52 },
+      { cx:18, cy:82 },
+      { cx:82, cy:82 },
       { cx:50, cy:82 }
     ];
 
-    function setCenteredPosition(el, cx, cy) {
-      el.style.left = cx + '%';
-      el.style.top = cy + '%';
-      el.style.webkitTransform = 'translate(-50%,-50%)';
-      el.style.transform = 'translate(-50%,-50%)';
-    }
+    var lastClockZone = -1;
+    var lastTempZone = -1;
 
     function getRandomIndex(length, exclude) {
       var idx = randomInt(0, length - 1);
-      if (length <= 1) return idx;
-      while (idx === exclude) {
+      while (length > 1 && idx === exclude) {
         idx = randomInt(0, length - 1);
       }
       return idx;
     }
 
-    function rectsOverlap(a, b, padding) {
+    function place(el, cx, cy) {
+      el.style.left = cx + '%';
+      el.style.top = cy + '%';
+    }
+
+    function overlap(a, b, padding) {
       return !(
         a.right + padding < b.left ||
         a.left > b.right + padding ||
@@ -353,98 +244,77 @@
       );
     }
 
-    function insideSafeMargins(rect, marginX, marginY) {
+    function inside(rect, marginX, marginY) {
       var vw = window.innerWidth;
       var vh = window.innerHeight;
-
-      return (
-        rect.left >= marginX &&
-        rect.right <= (vw - marginX) &&
-        rect.top >= marginY &&
-        rect.bottom <= (vh - marginY)
-      );
+      return rect.left >= marginX &&
+             rect.right <= (vw - marginX) &&
+             rect.top >= marginY &&
+             rect.bottom <= (vh - marginY);
     }
 
-    function tryPlaceElements() {
+    function moveWidgets() {
       var clock = document.getElementById('clock-group');
       var temp = document.getElementById('temp-wrap');
-
       var tries = 0;
       var ok = false;
 
       while (tries < 30 && !ok) {
-        var zClock = getRandomIndex(clockZones.length, lastClockZone);
-        var zTemp = getRandomIndex(tempZones.length, lastTempZone);
+        var zc = getRandomIndex(clockZones.length, lastClockZone);
+        var zt = getRandomIndex(tempZones.length, lastTempZone);
 
-        var c = clockZones[zClock];
-        var t = tempZones[zTemp];
+        var c = clockZones[zc];
+        var t = tempZones[zt];
 
-        /* jitter pequeño, pero controlado */
-        var cjx = randomInt(-2, 2);
-        var cjy = randomInt(-2, 2);
-        var tjx = randomInt(-2, 2);
-        var tjy = randomInt(-2, 2);
+        place(clock, c.cx + randomInt(-2, 2), c.cy + randomInt(-2, 2));
+        place(temp, t.cx + randomInt(-2, 2), t.cy + randomInt(-2, 2));
 
-        setCenteredPosition(clock, c.cx + cjx, c.cy + cjy);
-        setCenteredPosition(temp, t.cx + tjx, t.cy + tjy);
+        var rc = clock.getBoundingClientRect();
+        var rt = temp.getBoundingClientRect();
 
-        var clockRect = clock.getBoundingClientRect();
-        var tempRect = temp.getBoundingClientRect();
-
-        var clockInside = insideSafeMargins(clockRect, 16, 20);
-        var tempInside = insideSafeMargins(tempRect, 16, 20);
-        var noOverlap = !rectsOverlap(clockRect, tempRect, 18);
-
-        if (clockInside && tempInside && noOverlap) {
-          lastClockZone = zClock;
-          lastTempZone = zTemp;
+        if (inside(rc, 16, 16) && inside(rt, 16, 16) && !overlap(rc, rt, 20)) {
+          lastClockZone = zc;
+          lastTempZone = zt;
           ok = true;
         }
 
         tries++;
       }
 
-      /* Fallback muy seguro */
       if (!ok) {
-        setCenteredPosition(clock, 50, 38);
-        setCenteredPosition(temp, 82, 80);
-        lastClockZone = 1;
-        lastTempZone = 5;
+        place(clock, 50, 38);
+        place(temp, 82, 82);
       }
     }
 
-    tryPlaceElements();
-
-    function scheduleNextMove() {
+    function scheduleMove() {
       var nextMs = randomInt(120000, 240000);
       setTimeout(function() {
-        tryPlaceElements();
-        scheduleNextMove();
+        moveWidgets();
+        scheduleMove();
       }, nextMs);
     }
 
-    scheduleNextMove();
+    setMode();
+    updateClock();
+    updateDate();
+    loadWeather();
+    moveWidgets();
 
-    /* Microajuste mínimo */
-    function nudgeElements() {
+    setInterval(setMode, 30000);
+    setInterval(updateClock, 1000);
+    setInterval(updateDate, 60000);
+    setInterval(loadWeather, 600000);
+    setInterval(function() {
       var clock = document.getElementById('clock-group');
       var temp = document.getElementById('temp-wrap');
-
       clock.style.marginLeft = randomInt(-1, 1) + 'px';
       clock.style.marginTop = randomInt(-1, 1) + 'px';
-
       temp.style.marginLeft = randomInt(-1, 1) + 'px';
       temp.style.marginTop = randomInt(-1, 1) + 'px';
-    }
+    }, 45000);
 
-    setInterval(nudgeElements, 45000);
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(function() {});
-    }
-
-    document.oncontextmenu = function() { return false; };
-    document.ontouchstart = function(){};
+    scheduleMove();
   </script>
 </body>
 </html>
