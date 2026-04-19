@@ -29,6 +29,17 @@
       overflow:hidden;
     }
 
+    /* Franja superior "muerta" para compensar la UI del navegador */
+    #top-dead-zone {
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:12vh;
+      z-index:1;
+      pointer-events:none;
+    }
+
     .floating {
       position:absolute;
       white-space:nowrap;
@@ -80,7 +91,7 @@
     #temp-value {
       font-family:monospace;
       font-weight:bold;
-      font-size:42px;
+      font-size:40px;
       line-height:1;
     }
 
@@ -123,10 +134,19 @@
     .rest-mode #temp-label {
       opacity:0.38;
     }
+
+    @media screen and (max-width: 700px) {
+      #time { font-size:19vw; }
+      #date-text { font-size:16px; }
+      #temp-value { font-size:38px; }
+      #seconds { font-size:16px; }
+    }
   </style>
 </head>
 <body class="night">
   <div id="app">
+    <div id="top-dead-zone"></div>
+
     <div class="floating" id="clock-group">
       <div id="time">00:00</div>
       <div id="seconds">00</div>
@@ -199,29 +219,30 @@
       xhr.send();
     }
 
+    /* Zonas más bajas para compensar la barra del navegador */
     var clockZones = [
-      { cx:50, cy:24 },
-      { cx:50, cy:32 },
-      { cx:50, cy:40 },
-      { cx:50, cy:48 },
-      { cx:50, cy:56 },
-      { cx:40, cy:32 },
-      { cx:60, cy:32 },
-      { cx:40, cy:44 },
-      { cx:60, cy:44 },
-      { cx:40, cy:56 },
-      { cx:60, cy:56 }
+      { cx:50, cy:36 },
+      { cx:50, cy:44 },
+      { cx:50, cy:52 },
+      { cx:50, cy:60 },
+      { cx:42, cy:40 },
+      { cx:58, cy:40 },
+      { cx:42, cy:52 },
+      { cx:58, cy:52 },
+      { cx:42, cy:62 },
+      { cx:58, cy:62 }
     ];
 
+    /* Temperatura fuera del centro */
     var tempZones = [
-      { cx:16, cy:16 },
-      { cx:84, cy:16 },
-      { cx:16, cy:38 },
-      { cx:84, cy:38 },
-      { cx:16, cy:62 },
-      { cx:84, cy:62 },
-      { cx:18, cy:84 },
-      { cx:82, cy:84 }
+      { cx:16, cy:22 },
+      { cx:84, cy:22 },
+      { cx:14, cy:50 },
+      { cx:86, cy:50 },
+      { cx:16, cy:78 },
+      { cx:84, cy:78 },
+      { cx:22, cy:88 },
+      { cx:78, cy:88 }
     ];
 
     var lastClockZone = -1;
@@ -249,13 +270,13 @@
       );
     }
 
-    function inside(rect, marginX, marginY) {
+    function inside(rect, marginX, marginTop, marginBottom) {
       var vw = window.innerWidth;
       var vh = window.innerHeight;
       return rect.left >= marginX &&
              rect.right <= (vw - marginX) &&
-             rect.top >= marginY &&
-             rect.bottom <= (vh - marginY);
+             rect.top >= marginTop &&
+             rect.bottom <= (vh - marginBottom);
     }
 
     function moveWidgets() {
@@ -264,7 +285,7 @@
       var tries = 0;
       var ok = false;
 
-      while (tries < 30 && !ok) {
+      while (tries < 40 && !ok) {
         var zc = getRandomIndex(clockZones.length, lastClockZone);
         var zt = getRandomIndex(tempZones.length, lastTempZone);
 
@@ -277,7 +298,11 @@
         var rc = clock.getBoundingClientRect();
         var rt = temp.getBoundingClientRect();
 
-        if (inside(rc, 16, 10) && inside(rt, 16, 10) && !overlap(rc, rt, 20)) {
+        if (
+          inside(rc, 14, 56, 10) &&
+          inside(rt, 12, 42, 8) &&
+          !overlap(rc, rt, 22)
+        ) {
           lastClockZone = zc;
           lastTempZone = zt;
           ok = true;
@@ -287,8 +312,8 @@
       }
 
       if (!ok) {
-        place(clock, 50, 50);
-        place(temp, 82, 16);
+        place(clock, 50, 54);
+        place(temp, 84, 22);
       }
     }
 
@@ -310,6 +335,7 @@
     setInterval(updateClock, 1000);
     setInterval(updateDate, 60000);
     setInterval(loadWeather, 600000);
+
     setInterval(function() {
       var clock = document.getElementById('clock-group');
       var temp = document.getElementById('temp-wrap');
