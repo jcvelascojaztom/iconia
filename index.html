@@ -14,36 +14,44 @@
       box-sizing: border-box;
     }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       height: 100%;
       overflow: hidden;
+      background: #05090d;
       font-family: Arial, sans-serif;
       -webkit-user-select: none;
       user-select: none;
       -webkit-text-size-adjust: 100%;
-      background: #05090d;
-      color: #ffffff;
+      text-size-adjust: 100%;
     }
 
     body {
+      color: #ffffff;
       -webkit-transition: background-color 2.5s ease;
       transition: background-color 2.5s ease;
     }
 
-    /* Fondos más oscuros por periodo del día */
+    /* Fondos oscuros por momento del día */
     body.morning { background: #0a1822; }
-    body.day     { background: #0c202c; }
+    body.day { background: #0c202c; }
     body.evening { background: #08141d; }
-    body.night   { background: #05090d; }
+    body.night { background: #05090d; }
     body.rest-mode { background: #020508; }
 
     #app {
+      position: relative;
       width: 100vw;
       height: 100vh;
+      overflow: hidden;
       padding: 5vh 7vw 4vh;
       text-align: center;
-      position: relative;
+      -webkit-transition: -webkit-transform 1.6s ease;
+      transition: -webkit-transform 1.6s ease;
+      transition: transform 1.6s ease;
+      transition: transform 1.6s ease, -webkit-transform 1.6s ease;
+      will-change: transform;
     }
 
     .soft-color {
@@ -52,15 +60,15 @@
     }
 
     @-webkit-keyframes softColor {
-      0%   { color: #ffffff; }
-      50%  { color: #edf7ff; }
-      100% { color: #dcefff; }
+      0% { color: #ffffff; }
+      45% { color: #edf7ff; }
+      100% { color: #cfefff; }
     }
 
     @keyframes softColor {
-      0%   { color: #ffffff; }
-      50%  { color: #edf7ff; }
-      100% { color: #dcefff; }
+      0% { color: #ffffff; }
+      45% { color: #edf7ff; }
+      100% { color: #cfefff; }
     }
 
     #clock-panel {
@@ -82,6 +90,7 @@
       margin-top: 2vh;
       margin-right: 1vw;
       opacity: 0.95;
+      text-shadow: 0 0 18px rgba(255,255,255,0.08);
     }
 
     #time {
@@ -92,6 +101,8 @@
       font-size: 23vw;
       line-height: 0.85;
       letter-spacing: -0.08em;
+      white-space: nowrap;
+      text-shadow: 0 0 20px rgba(255,255,255,0.08);
     }
 
     #ampm {
@@ -100,8 +111,10 @@
       font-family: monospace;
       font-weight: bold;
       font-size: 5vw;
+      line-height: 1;
       margin-top: 2.5vh;
       margin-left: 1vw;
+      letter-spacing: 0.04em;
       opacity: 0.92;
     }
 
@@ -125,6 +138,7 @@
       font-size: 8vw;
       line-height: 1.05;
       text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
 
     #date-text {
@@ -134,6 +148,7 @@
       font-size: 6vw;
       line-height: 1.1;
       text-transform: uppercase;
+      letter-spacing: -0.02em;
     }
 
     #weather-card {
@@ -156,9 +171,12 @@
 
     .weather-icon {
       display: inline-block;
-      width: 1.6em;
+      width: 1.7em;
+      min-width: 1.7em;
       font-family: Arial, sans-serif;
+      font-weight: normal;
       text-align: center;
+      letter-spacing: 0;
     }
 
     #weather-updated {
@@ -171,9 +189,9 @@
       opacity: 0.48;
     }
 
-    .primary   { color: #ffffff; }
+    .primary { color: #ffffff; }
     .secondary { color: rgba(255,255,255,0.90); }
-    .muted     { color: rgba(255,255,255,0.76); }
+    .muted { color: rgba(255,255,255,0.76); }
 
     body.rest-mode .primary,
     body.rest-mode .secondary,
@@ -191,24 +209,25 @@
         padding: 4vh 6vw 3vh;
       }
 
-      #time {
-        font-size: 16vw;
+      #time { font-size: 16vw; }
+      #weekday { font-size: 5vw; }
+      #date-text { font-size: 4vw; }
+      .weather-line { font-size: 3.6vw; }
+      #weather-updated { font-size: 2vw; }
+    }
+
+    @media screen and (max-height: 720px) {
+      #app {
+        padding-top: 4vh;
+        padding-bottom: 3vh;
       }
 
-      #weekday {
-        font-size: 5vw;
-      }
-
-      #date-text {
-        font-size: 4vw;
+      #date-block {
+        margin-top: 3.2vh;
       }
 
       .weather-line {
-        font-size: 3.6vw;
-      }
-
-      #weather-updated {
-        font-size: 2vw;
+        margin-bottom: 1vh;
       }
     }
 
@@ -218,7 +237,8 @@
         animation: none;
       }
 
-      body {
+      body,
+      #app {
         -webkit-transition: none;
         transition: none;
       }
@@ -227,9 +247,9 @@
 </head>
 <body class="night">
   <div id="app">
-    <section id="clock-panel">
+    <section id="clock-panel" aria-label="Hora actual">
       <div id="time-row">
-        <span id="period-icon" class="soft-color">☾</span>
+        <span id="period-icon" class="soft-color" aria-hidden="true">☾</span>
         <span id="time" class="primary soft-color">12:00</span>
         <span id="ampm" class="secondary soft-color">AM</span>
       </div>
@@ -242,24 +262,24 @@
       </div>
     </section>
 
-    <section id="weather-card">
+    <section id="weather-card" aria-label="Clima actual en Puebla">
       <div class="weather-line secondary">
-        <span class="weather-icon" id="weather-icon">☀</span>
+        <span class="weather-icon" id="weather-icon" aria-hidden="true">☀</span>
         <span>CLIMA: <span id="weather-desc">--</span> <span id="temp-value">--°C</span></span>
       </div>
 
       <div class="weather-line secondary">
-        <span class="weather-icon" id="precip-icon">☂</span>
+        <span class="weather-icon" id="precip-icon" aria-hidden="true">○</span>
         <span>PRECIPITACIÓN: <span id="precip-value">--%</span></span>
       </div>
 
       <div class="weather-line secondary">
-        <span class="weather-icon" id="humidity-icon">💧</span>
+        <span class="weather-icon" id="humidity-icon" aria-hidden="true">💧</span>
         <span>HUMEDAD: <span id="humidity-value">--%</span></span>
       </div>
 
       <div class="weather-line secondary">
-        <span class="weather-icon" id="wind-icon">〰</span>
+        <span class="weather-icon" id="wind-icon" aria-hidden="true">〰</span>
         <span>VIENTO: <span id="wind-value">-- KM/H</span></span>
       </div>
 
@@ -275,12 +295,29 @@
     var DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
     var MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
+    var shiftPoints = [
+      { x: 0, y: 0 },
+      { x: 3, y: 0 },
+      { x: -3, y: 0 },
+      { x: 0, y: 3 },
+      { x: 0, y: -3 },
+      { x: 3, y: 3 },
+      { x: -3, y: 3 },
+      { x: 3, y: -3 },
+      { x: -3, y: -3 }
+    ];
+    var lastShiftIndex = 0;
+
     function el(id) {
       return document.getElementById(id);
     }
 
     function pad(n) {
       return n < 10 ? '0' + n : '' + n;
+    }
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     function to12Hour(h) {
@@ -290,15 +327,15 @@
 
     function getDayPeriod(hour) {
       if (hour >= 5 && hour < 12) {
-        return { cls: 'morning', icon: '☀' };
+        return { cls: 'morning', icon: '🌅' };
       }
       if (hour >= 12 && hour < 18) {
         return { cls: 'day', icon: '☀' };
       }
       if (hour >= 18 && hour < 21) {
-        return { cls: 'evening', icon: '◐' };
+        return { cls: 'evening', icon: '🌆' };
       }
-      return { cls: 'night', icon: '☾' };
+      return { cls: 'night', icon: '🌙' };
     }
 
     function setMode(now) {
@@ -332,59 +369,73 @@
 
     function weatherCodeInfo(code, isDay) {
       var map = {
-        0:  ['SOLEADO', isDay ? '☀' : '☾'],
-        1:  ['MAYORMENTE DESPEJADO', isDay ? '☀' : '☾'],
-        2:  ['PARCIALMENTE NUBLADO', '⛅'],
-        3:  ['NUBLADO', '☁'],
-        45: ['NIEBLA', '≋'],
-        48: ['NIEBLA DENSA', '≋'],
-        51: ['LLOVIZNA LIGERA', '☂'],
-        53: ['LLOVIZNA', '☂'],
-        55: ['LLOVIZNA INTENSA', '☂'],
-        61: ['LLUVIA LIGERA', '☔'],
-        63: ['LLUVIA', '☔'],
-        65: ['LLUVIA FUERTE', '☔'],
-        66: ['LLUVIA HELADA', '☔'],
-        67: ['LLUVIA HELADA FUERTE', '☔'],
-        71: ['NIEVE LIGERA', '❄'],
-        73: ['NIEVE', '❄'],
-        75: ['NIEVE INTENSA', '❄'],
-        77: ['GRANIZO', '❄'],
-        80: ['CHUBASCOS', '☔'],
-        81: ['CHUBASCOS FUERTES', '☔'],
-        82: ['AGUACERO', '☔'],
-        85: ['NEVADAS', '❄'],
-        86: ['NEVADAS FUERTES', '❄'],
-        95: ['TORMENTA', '⚡'],
-        96: ['TORMENTA CON GRANIZO', '⚡'],
-        99: ['TORMENTA FUERTE', '⚡']
+        0: ['SOLEADO', isDay ? '☀️' : '🌙'],
+        1: ['MAYORMENTE DESPEJADO', isDay ? '🌤️' : '🌙'],
+        2: ['PARCIALMENTE NUBLADO', '⛅'],
+        3: ['NUBLADO', '☁️'],
+        45: ['NIEBLA', '🌫️'],
+        48: ['NIEBLA DENSA', '🌫️'],
+        51: ['LLOVIZNA LIGERA', '🌦️'],
+        53: ['LLOVIZNA', '🌦️'],
+        55: ['LLOVIZNA INTENSA', '🌧️'],
+        56: ['LLOVIZNA HELADA', '🌧️'],
+        57: ['LLOVIZNA HELADA', '🌧️'],
+        61: ['LLUVIA LIGERA', '🌧️'],
+        63: ['LLUVIA', '🌧️'],
+        65: ['LLUVIA FUERTE', '⛈️'],
+        66: ['LLUVIA HELADA', '🌧️'],
+        67: ['LLUVIA HELADA FUERTE', '⛈️'],
+        71: ['NIEVE LIGERA', '🌨️'],
+        73: ['NIEVE', '🌨️'],
+        75: ['NIEVE INTENSA', '❄️'],
+        77: ['GRANIZO', '🌨️'],
+        80: ['CHUBASCOS', '🌦️'],
+        81: ['CHUBASCOS FUERTES', '🌧️'],
+        82: ['AGUACERO', '⛈️'],
+        85: ['NEVADAS', '🌨️'],
+        86: ['NEVADAS FUERTES', '❄️'],
+        95: ['TORMENTA', '⛈️'],
+        96: ['TORMENTA CON GRANIZO', '⛈️'],
+        99: ['TORMENTA FUERTE', '⛈️']
       };
 
       if (map[code]) return map[code];
-      return ['CLIMA', isDay ? '☀' : '☾'];
+      return ['CLIMA', isDay ? '☀️' : '🌙'];
     }
 
     function getPrecipIcon(prob) {
-      if (prob < 20) return '☂';
-      if (prob < 60) return '☔';
+      if (prob < 10) return '○';
+      if (prob < 40) return '☂️';
       return '☔';
     }
 
-    function getHumidityIcon(h) {
-      if (h < 35) return '◔';
-      if (h < 65) return '💧';
+    function getHumidityIcon(humidity) {
+      if (humidity < 35) return '◔';
+      if (humidity < 65) return '💧';
       return '💧💧';
     }
 
-    function getWindIcon(w) {
-      if (w < 10) return '〰';
-      if (w < 25) return '〰〰';
+    function getWindIcon(wind) {
+      if (wind < 10) return '〰';
+      if (wind < 25) return '〰〰';
       return '〰〰〰';
     }
 
+    function getCurrentHourIndex(hourlyTimes) {
+      if (!hourlyTimes || !hourlyTimes.length) return new Date().getHours();
+
+      var now = new Date();
+      var target = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) + 'T' + pad(now.getHours()) + ':00';
+
+      for (var i = 0; i < hourlyTimes.length; i++) {
+        if (hourlyTimes[i] === target) return i;
+      }
+
+      return now.getHours();
+    }
+
     function loadWeather() {
-      var url =
-        'https://api.open-meteo.com/v1/forecast' +
+      var url = 'https://api.open-meteo.com/v1/forecast' +
         '?latitude=' + LAT +
         '&longitude=' + LON +
         '&current=temperature_2m,relative_humidity_2m,is_day,weather_code,wind_speed_10m' +
@@ -408,13 +459,13 @@
           var current = data.current || {};
           var hourly = data.hourly || {};
           var now = new Date();
-          var hourIndex = now.getHours();
 
           var temp = Math.round(current.temperature_2m || 0);
           var humidity = Math.round(current.relative_humidity_2m || 0);
           var wind = Math.round(current.wind_speed_10m || 0);
           var isDay = current.is_day === 1;
           var wcode = current.weather_code;
+          var hourIndex = getCurrentHourIndex(hourly.time);
 
           var precip = 0;
           if (hourly.precipitation_probability && hourly.precipitation_probability.length > hourIndex) {
@@ -436,8 +487,7 @@
           el('wind-icon').innerHTML = getWindIcon(wind);
           el('wind-value').innerHTML = wind + ' KM/H';
 
-          el('weather-updated').innerHTML =
-            'PUEBLA · ACTUALIZADO ' + pad(now.getHours()) + ':' + pad(now.getMinutes());
+          el('weather-updated').innerHTML = 'PUEBLA · ACTUALIZADO ' + pad(now.getHours()) + ':' + pad(now.getMinutes());
         } catch (e) {
           el('weather-updated').innerHTML = 'PUEBLA · ERROR DE CLIMA';
         }
@@ -446,13 +496,27 @@
       xhr.send();
     }
 
+    function microShift() {
+      var idx = randomInt(0, shiftPoints.length - 1);
+      while (shiftPoints.length > 1 && idx === lastShiftIndex) {
+        idx = randomInt(0, shiftPoints.length - 1);
+      }
+
+      lastShiftIndex = idx;
+      var p = shiftPoints[idx];
+      el('app').style.webkitTransform = 'translate(' + p.x + 'px,' + p.y + 'px)';
+      el('app').style.transform = 'translate(' + p.x + 'px,' + p.y + 'px)';
+    }
+
     updateClock();
     updateDate();
     loadWeather();
+    microShift();
 
     setInterval(updateClock, 1000);
     setInterval(updateDate, 60000);
     setInterval(loadWeather, 600000);
+    setInterval(microShift, 180000);
   </script>
 </body>
 </html>
