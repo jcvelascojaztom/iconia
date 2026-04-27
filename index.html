@@ -2,350 +2,464 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Iconia Clock</title>
-  <meta name="theme-color" content="#030508">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Iconia Clock Vertical</title>
+  <meta name="theme-color" content="#0b2f3d">
 
   <style>
-    * { margin:0; padding:0; -webkit-box-sizing:border-box; box-sizing:border-box; }
-
-    html, body {
-      width:100%;
-      height:100%;
-      overflow:hidden;
-      background:#030508;
-      font-family:Arial, sans-serif;
-      -webkit-user-select:none;
-      user-select:none;
+    * {
+      margin: 0;
+      padding: 0;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
     }
 
-    body.day { background:#091018; }
-    body.night { background:#030508; }
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0b2f3d;
+      font-family: Arial, sans-serif;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      color: #ffffff;
+      -webkit-transition: background 2.5s ease;
+      transition: background 2.5s ease;
+    }
+
+    body.morning {
+      background: #12495d;
+    }
+
+    body.day {
+      background: #17677f;
+    }
+
+    body.evening {
+      background: #123c55;
+    }
+
+    body.night {
+      background: #071520;
+    }
+
+    body.rest-mode {
+      background: #03080d;
+    }
 
     #app {
-      position:relative;
-      width:100vw;
-      height:100vh;
-      overflow:hidden;
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      padding: 5.5vh 7vw 4vh;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+      flex-direction: column;
+      -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+      justify-content: space-between;
+      text-align: center;
     }
 
-    /* Franja superior "muerta" para compensar la UI del navegador */
-    #top-dead-zone {
-      position:absolute;
-      top:0;
-      left:0;
-      right:0;
-      height:12vh;
-      z-index:1;
-      pointer-events:none;
+    .panel {
+      width: 100%;
+      position: relative;
+      z-index: 2;
     }
 
-    .floating {
-      position:absolute;
-      white-space:nowrap;
-      -webkit-transition:left 2s ease, top 2s ease, opacity 1s ease, color 1s ease;
-      transition:left 2s ease, top 2s ease, opacity 1s ease, color 1s ease;
-      -webkit-transform:translate(-50%,-50%);
-      transform:translate(-50%,-50%);
+    .soft-shift {
+      -webkit-animation: colorDrift 22s ease-in-out infinite alternate;
+      animation: colorDrift 22s ease-in-out infinite alternate;
     }
 
-    #clock-group {
-      z-index:3;
-      text-align:center;
-      max-width:92vw;
+    #time-row {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: start;
+      -ms-flex-align: start;
+      align-items: flex-start;
+      -webkit-box-pack: center;
+      -ms-flex-pack: center;
+      justify-content: center;
+      gap: 1.7vw;
+    }
+
+    #period-icon {
+      font-family: Arial, sans-serif;
+      font-size: clamp(30px, 9vw, 70px);
+      line-height: 1;
+      margin-top: 1.4vh;
+      opacity: 0.92;
+      text-shadow: 0 0 18px rgba(255,255,255,0.08);
     }
 
     #time {
-      font-family:monospace;
-      font-weight:bold;
-      font-size:18vw;
-      line-height:0.9;
-      letter-spacing:-2px;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: clamp(72px, 22vw, 172px);
+      line-height: 0.86;
+      letter-spacing: -0.08em;
+      white-space: nowrap;
+      text-shadow: 0 0 20px rgba(255,255,255,0.08);
+    }
+
+    #ampm {
+      font-family: monospace;
+      font-weight: bold;
+      font-size: clamp(18px, 5vw, 40px);
+      line-height: 1;
+      margin-top: 2.2vh;
+      letter-spacing: 0.04em;
+      opacity: 0.92;
     }
 
     #seconds {
-      margin-top:4px;
-      text-align:right;
-      font-family:monospace;
-      font-weight:bold;
-      font-size:18px;
-      letter-spacing:2px;
-      opacity:0.7;
+      margin-top: 1vh;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: clamp(18px, 5vw, 36px);
+      letter-spacing: 0.22em;
+      opacity: 0.78;
+    }
+
+    #date-block {
+      margin-top: 4.2vh;
+    }
+
+    #weekday {
+      font-family: monospace;
+      font-weight: bold;
+      font-size: clamp(28px, 8vw, 62px);
+      line-height: 1.05;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
 
     #date-text {
-      margin-top:8px;
-      font-family:monospace;
-      font-weight:bold;
-      font-size:18px;
-      line-height:1.2;
-      text-align:center;
-      white-space:nowrap;
+      margin-top: 1.3vh;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: clamp(22px, 6.2vw, 48px);
+      line-height: 1.1;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
     }
 
-    #temp-wrap {
-      z-index:2;
-      text-align:center;
+    #weather-card {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+      flex-direction: column;
+      gap: 1.15vh;
+      text-align: left;
+      margin-bottom: 0.5vh;
     }
 
-    #temp-value {
-      font-family:monospace;
-      font-weight:bold;
-      font-size:40px;
-      line-height:1;
+    .weather-line {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center;
+      gap: 2.8vw;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: clamp(20px, 5.6vw, 43px);
+      line-height: 1.08;
+      text-transform: uppercase;
+      letter-spacing: -0.03em;
     }
 
-    #temp-label {
-      margin-top:4px;
-      font-size:11px;
-      letter-spacing:2px;
-      opacity:0.75;
+    .weather-icon {
+      width: 1.35em;
+      min-width: 1.35em;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-weight: normal;
+      letter-spacing: 0;
     }
 
-    body.day #time,
-    body.day #date-text,
-    body.day #temp-value {
-      color:#6EB7DA;
+    #weather-updated {
+      margin-top: 1.1vh;
+      font-size: clamp(11px, 3vw, 18px);
+      font-family: monospace;
+      font-weight: bold;
+      letter-spacing: 0.12em;
+      text-align: center;
+      opacity: 0.48;
     }
 
-    body.day #seconds,
-    body.day #temp-label {
-      color:#426E88;
+    .primary {
+      color: #ffffff;
     }
 
-    body.night #time,
-    body.night #date-text,
-    body.night #temp-value {
-      color:#2C5673;
+    .secondary {
+      color: rgba(255,255,255,0.88);
     }
 
-    body.night #seconds,
-    body.night #temp-label {
-      color:#1B3444;
+    .muted {
+      color: rgba(255,255,255,0.76);
     }
 
-    .rest-mode #time,
-    .rest-mode #date-text,
-    .rest-mode #temp-value {
-      opacity:0.78;
+    body.rest-mode .primary,
+    body.rest-mode .secondary,
+    body.rest-mode .muted {
+      opacity: 0.72;
     }
 
-    .rest-mode #seconds,
-    .rest-mode #temp-label {
-      opacity:0.38;
+    body.rest-mode #seconds,
+    body.rest-mode #weather-updated {
+      opacity: 0.34;
     }
 
-    @media screen and (max-width: 700px) {
-      #time { font-size:19vw; }
-      #date-text { font-size:16px; }
-      #temp-value { font-size:38px; }
-      #seconds { font-size:16px; }
+    @-webkit-keyframes colorDrift {
+      0% { color: #ffffff; }
+      45% { color: #eaf8ff; }
+      100% { color: #cfefff; }
+    }
+
+    @keyframes colorDrift {
+      0% { color: #ffffff; }
+      45% { color: #eaf8ff; }
+      100% { color: #cfefff; }
+    }
+
+    @media screen and (orientation: landscape) {
+      #app {
+        padding: 4vh 7vw;
+      }
+
+      #time {
+        font-size: clamp(70px, 16vw, 145px);
+      }
+
+      #date-block {
+        margin-top: 2.2vh;
+      }
+
+      #weather-card {
+        display: -ms-grid;
+        display: grid;
+        -ms-grid-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.4vh 4vw;
+      }
+
+      #weather-updated {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media screen and (max-height: 720px) {
+      #app {
+        padding-top: 4vh;
+        padding-bottom: 3vh;
+      }
+
+      #date-block {
+        margin-top: 2.8vh;
+      }
+
+      #weather-card {
+        gap: 0.9vh;
+      }
+    }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+      .soft-shift {
+        -webkit-animation: none;
+        animation: none;
+      }
+
+      body {
+        -webkit-transition: none;
+        transition: none;
+      }
     }
   </style>
 </head>
 <body class="night">
   <div id="app">
-    <div id="top-dead-zone"></div>
+    <section class="panel" id="clock-panel" aria-label="Hora actual">
+      <div id="time-row">
+        <div id="period-icon" class="soft-shift" aria-hidden="true">☾</div>
+        <div id="time" class="primary soft-shift">12:00</div>
+        <div id="ampm" class="secondary soft-shift">AM</div>
+      </div>
+      <div id="seconds" class="muted">00</div>
 
-    <div class="floating" id="clock-group">
-      <div id="time">00:00</div>
-      <div id="seconds">00</div>
-      <div id="date-text">Sábado, 18 de abril de 2026</div>
-    </div>
+      <div id="date-block">
+        <div id="weekday" class="primary soft-shift">LUNES</div>
+        <div id="date-text" class="secondary soft-shift">27 DE ABRIL 2026</div>
+      </div>
+    </section>
 
-    <div class="floating" id="temp-wrap">
-      <div id="temp-value">--°</div>
-      <div id="temp-label">PUEBLA</div>
-    </div>
+    <section class="panel" id="weather-card" aria-label="Clima actual en Puebla">
+      <div class="weather-line secondary">
+        <span class="weather-icon" id="weather-icon" aria-hidden="true">☀</span>
+        <span>CLIMA: <span id="weather-desc">--</span> <span id="temp-value">--°C</span></span>
+      </div>
+      <div class="weather-line secondary">
+        <span class="weather-icon" aria-hidden="true">☔</span>
+        <span>PRECIPITACIONES: <span id="precip-value">--%</span></span>
+      </div>
+      <div class="weather-line secondary">
+        <span class="weather-icon" aria-hidden="true">💧</span>
+        <span>HUMEDAD: <span id="humidity-value">--%</span></span>
+      </div>
+      <div class="weather-line secondary">
+        <span class="weather-icon" aria-hidden="true">〰</span>
+        <span>VIENTO: <span id="wind-value">-- KM/H</span></span>
+      </div>
+      <div id="weather-updated">PUEBLA · ACTUALIZANDO</div>
+    </section>
   </div>
 
   <script>
     var LAT = 19.0414;
     var LON = -98.2063;
+    var TZ = 'America%2FMexico_City';
 
     var DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
     var MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+    function el(id) {
+      return document.getElementById(id);
+    }
 
     function pad(n) {
       return n < 10 ? '0' + n : '' + n;
     }
 
-    function randomInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
+    function hour12(h) {
+      var v = h % 12;
+      return v === 0 ? 12 : v;
     }
 
-    function setMode() {
-      var h = new Date().getHours();
-      document.body.className = (h >= 20 || h < 7) ? 'night' : 'day';
+    function getPeriod(hour) {
+      if (hour >= 5 && hour < 12) {
+        return { name: 'morning', icon: '☀' };
+      }
+      if (hour >= 12 && hour < 18) {
+        return { name: 'day', icon: '☀' };
+      }
+      if (hour >= 18 && hour < 21) {
+        return { name: 'evening', icon: '◐' };
+      }
+      return { name: 'night', icon: '☾' };
+    }
+
+    function setMode(now) {
+      var h = now.getHours();
+      var period = getPeriod(h);
+      document.body.className = period.name;
+
       if (h >= 1 && h < 6) {
         document.body.className += ' rest-mode';
       }
+
+      el('period-icon').innerHTML = period.icon;
     }
 
     function updateClock() {
       var now = new Date();
-      document.getElementById('time').innerHTML = pad(now.getHours()) + ':' + pad(now.getMinutes());
-      document.getElementById('seconds').innerHTML = pad(now.getSeconds());
+      var h = now.getHours();
+      el('time').innerHTML = pad(hour12(h)) + ':' + pad(now.getMinutes());
+      el('ampm').innerHTML = h >= 12 ? 'PM' : 'AM';
+      el('seconds').innerHTML = pad(now.getSeconds());
+      setMode(now);
     }
 
     function updateDate() {
       var now = new Date();
-      var texto = DIAS[now.getDay()] + ', ' + now.getDate() + ' de ' + MESES[now.getMonth()] + ' de ' + now.getFullYear();
-      document.getElementById('date-text').innerHTML = texto;
+      el('weekday').innerHTML = DIAS[now.getDay()].toUpperCase();
+      el('date-text').innerHTML = now.getDate() + ' DE ' + MESES[now.getMonth()].toUpperCase() + ' ' + now.getFullYear();
+    }
+
+    function weatherCodeInfo(code, isDay) {
+      var map = {
+        0: ['SOLEADO', isDay ? '☀' : '☾'],
+        1: ['MAYORMENTE DESPEJADO', isDay ? '🌤' : '☾'],
+        2: ['PARCIALMENTE NUBLADO', '⛅'],
+        3: ['NUBLADO', '☁'],
+        45: ['NIEBLA', '≋'],
+        48: ['NIEBLA', '≋'],
+        51: ['LLOVIZNA', '☂'],
+        53: ['LLOVIZNA', '☂'],
+        55: ['LLOVIZNA', '☂'],
+        61: ['LLUVIA', '☔'],
+        63: ['LLUVIA', '☔'],
+        65: ['LLUVIA FUERTE', '☔'],
+        80: ['CHUBASCOS', '☔'],
+        81: ['CHUBASCOS', '☔'],
+        82: ['CHUBASCOS FUERTES', '☔'],
+        95: ['TORMENTA', '⚡'],
+        96: ['TORMENTA', '⚡'],
+        99: ['TORMENTA', '⚡']
+      };
+      return map[code] || ['CLIMA', isDay ? '☀' : '☾'];
     }
 
     function loadWeather() {
       var url = 'https://api.open-meteo.com/v1/forecast' +
         '?latitude=' + LAT +
         '&longitude=' + LON +
-        '&current=temperature_2m' +
-        '&timezone=America%2FMexico_City' +
+        '&current=temperature_2m,relative_humidity_2m,is_day,precipitation,weather_code,wind_speed_10m' +
+        '&timezone=' + TZ +
         '&forecast_days=1';
 
       var xhr = new XMLHttpRequest();
       xhr.open('GET', url, true);
-
       xhr.onreadystatechange = function() {
         if (xhr.readyState !== 4) return;
-        if (xhr.status !== 200) return;
+
+        if (xhr.status !== 200) {
+          el('weather-updated').innerHTML = 'PUEBLA · SIN CONEXIÓN';
+          return;
+        }
 
         try {
           var data = JSON.parse(xhr.responseText);
-          document.getElementById('temp-value').innerHTML =
-            Math.round(data.current.temperature_2m) + '°';
-        } catch (e) {}
-      };
+          var c = data.current || {};
+          var info = weatherCodeInfo(c.weather_code, c.is_day === 1);
 
+          el('weather-desc').innerHTML = info[0];
+          el('weather-icon').innerHTML = info[1];
+          el('temp-value').innerHTML = Math.round(c.temperature_2m) + '°C';
+          el('precip-value').innerHTML = Math.round(c.precipitation || 0) + '%';
+          el('humidity-value').innerHTML = Math.round(c.relative_humidity_2m) + '%';
+          el('wind-value').innerHTML = Math.round(c.wind_speed_10m) + ' KM/H';
+          el('weather-updated').innerHTML = 'PUEBLA · ACTUALIZADO ' + pad(new Date().getHours()) + ':' + pad(new Date().getMinutes());
+        } catch (e) {
+          el('weather-updated').innerHTML = 'PUEBLA · ERROR DE CLIMA';
+        }
+      };
       xhr.send();
     }
 
-    /* Zonas más bajas para compensar la barra del navegador */
-    var clockZones = [
-      { cx:50, cy:36 },
-      { cx:50, cy:44 },
-      { cx:50, cy:52 },
-      { cx:50, cy:60 },
-      { cx:42, cy:40 },
-      { cx:58, cy:40 },
-      { cx:42, cy:52 },
-      { cx:58, cy:52 },
-      { cx:42, cy:62 },
-      { cx:58, cy:62 }
-    ];
-
-    /* Temperatura fuera del centro */
-    var tempZones = [
-      { cx:16, cy:22 },
-      { cx:84, cy:22 },
-      { cx:14, cy:50 },
-      { cx:86, cy:50 },
-      { cx:16, cy:78 },
-      { cx:84, cy:78 },
-      { cx:22, cy:88 },
-      { cx:78, cy:88 }
-    ];
-
-    var lastClockZone = -1;
-    var lastTempZone = -1;
-
-    function getRandomIndex(length, exclude) {
-      var idx = randomInt(0, length - 1);
-      while (length > 1 && idx === exclude) {
-        idx = randomInt(0, length - 1);
-      }
-      return idx;
-    }
-
-    function place(el, cx, cy) {
-      el.style.left = cx + '%';
-      el.style.top = cy + '%';
-    }
-
-    function overlap(a, b, padding) {
-      return !(
-        a.right + padding < b.left ||
-        a.left > b.right + padding ||
-        a.bottom + padding < b.top ||
-        a.top > b.bottom + padding
-      );
-    }
-
-    function inside(rect, marginX, marginTop, marginBottom) {
-      var vw = window.innerWidth;
-      var vh = window.innerHeight;
-      return rect.left >= marginX &&
-             rect.right <= (vw - marginX) &&
-             rect.top >= marginTop &&
-             rect.bottom <= (vh - marginBottom);
-    }
-
-    function moveWidgets() {
-      var clock = document.getElementById('clock-group');
-      var temp = document.getElementById('temp-wrap');
-      var tries = 0;
-      var ok = false;
-
-      while (tries < 40 && !ok) {
-        var zc = getRandomIndex(clockZones.length, lastClockZone);
-        var zt = getRandomIndex(tempZones.length, lastTempZone);
-
-        var c = clockZones[zc];
-        var t = tempZones[zt];
-
-        place(clock, c.cx + randomInt(-2, 2), c.cy + randomInt(-2, 2));
-        place(temp, t.cx + randomInt(-2, 2), t.cy + randomInt(-2, 2));
-
-        var rc = clock.getBoundingClientRect();
-        var rt = temp.getBoundingClientRect();
-
-        if (
-          inside(rc, 14, 56, 10) &&
-          inside(rt, 12, 42, 8) &&
-          !overlap(rc, rt, 22)
-        ) {
-          lastClockZone = zc;
-          lastTempZone = zt;
-          ok = true;
-        }
-
-        tries++;
-      }
-
-      if (!ok) {
-        place(clock, 50, 54);
-        place(temp, 84, 22);
-      }
-    }
-
-    function scheduleMove() {
-      var nextMs = randomInt(120000, 240000);
-      setTimeout(function() {
-        moveWidgets();
-        scheduleMove();
-      }, nextMs);
-    }
-
-    setMode();
     updateClock();
     updateDate();
     loadWeather();
-    moveWidgets();
 
-    setInterval(setMode, 30000);
     setInterval(updateClock, 1000);
     setInterval(updateDate, 60000);
     setInterval(loadWeather, 600000);
-
-    setInterval(function() {
-      var clock = document.getElementById('clock-group');
-      var temp = document.getElementById('temp-wrap');
-      clock.style.marginLeft = randomInt(-1, 1) + 'px';
-      clock.style.marginTop = randomInt(-1, 1) + 'px';
-      temp.style.marginLeft = randomInt(-1, 1) + 'px';
-      temp.style.marginTop = randomInt(-1, 1) + 'px';
-    }, 45000);
-
-    scheduleMove();
   </script>
 </body>
 </html>
