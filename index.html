@@ -291,6 +291,7 @@
     var LAT = 19.0414;
     var LON = -98.2063;
     var TZ = 'America%2FMexico_City';
+    var DISPLAY_TZ = 'America/Mexico_City';
 
     var DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
     var MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -350,21 +351,67 @@
       el('period-icon').innerHTML = period.icon;
     }
 
-    function updateClock() {
+    function getMexicoCityParts() {
       var now = new Date();
-      var h = now.getHours();
 
-      el('time').innerHTML = pad(to12Hour(h)) + ':' + pad(now.getMinutes());
+      try {
+        var parts = new Intl.DateTimeFormat('es-MX', {
+          timeZone: DISPLAY_TZ,
+          year: 'numeric',
+          month: 'numeric',
+          day: 'numeric',
+          weekday: 'long',
+          hour: 'numeric',
+          minute: 'numeric',
+          second: 'numeric',
+          hour12: false
+        }).formatToParts(now);
+
+        var out = {};
+        for (var i = 0; i < parts.length; i++) {
+          out[parts[i].type] = parts[i].value;
+        }
+
+        return {
+          year: parseInt(out.year, 10),
+          month: parseInt(out.month, 10),
+          day: parseInt(out.day, 10),
+          weekdayName: out.weekday,
+          hour: parseInt(out.hour, 10),
+          minute: parseInt(out.minute, 10),
+          second: parseInt(out.second, 10)
+        };
+      } catch (e) {
+        /* Respaldo para navegadores viejos: Centro de México fijo UTC-6, sin horario de verano. */
+        var utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        var mx = new Date(utc - (6 * 60 * 60000));
+        return {
+          year: mx.getUTCFullYear(),
+          month: mx.getUTCMonth() + 1,
+          day: mx.getUTCDate(),
+          weekdayName: DIAS[mx.getUTCDay()],
+          hour: mx.getUTCHours(),
+          minute: mx.getUTCMinutes(),
+          second: mx.getUTCSeconds()
+        };
+      }
+    }
+
+    function updateClock() {
+      var mx = getMexicoCityParts();
+      var h = mx.hour;
+
+      el('time').innerHTML = pad(to12Hour(h)) + ':' + pad(mx.minute);
       el('ampm').innerHTML = h >= 12 ? 'PM' : 'AM';
-      el('seconds').innerHTML = pad(now.getSeconds());
+      el('seconds').innerHTML = pad(mx.second);
 
-      setMode(now);
+      setMode({ getHours: function() { return h; } });
     }
 
     function updateDate() {
-      var now = new Date();
-      el('weekday').innerHTML = DIAS[now.getDay()].toUpperCase();
-      el('date-text').innerHTML = now.getDate() + ' DE ' + MESES[now.getMonth()].toUpperCase() + ' ' + now.getFullYear();
+      var mx = getMexicoCityParts();
+      el('weekday').innerHTML = mx.weekdayName.toUpperCase();
+      el('date-text').innerHTML = mx.day + ' DE ' + MESES[mx.month - 1].toUpperCase() + ' ' + mx.year;
     }
 
     function weatherCodeInfo(code, isDay) {
@@ -459,6 +506,7 @@
           var current = data.current || {};
           var hourly = data.hourly || {};
           var now = new Date();
+          var mxNow = getMexicoCityParts();
 
           var temp = Math.round(current.temperature_2m || 0);
           var humidity = Math.round(current.relative_humidity_2m || 0);
@@ -487,7 +535,7 @@
           el('wind-icon').innerHTML = getWindIcon(wind);
           el('wind-value').innerHTML = wind + ' KM/H';
 
-          el('weather-updated').innerHTML = 'PUEBLA · ACTUALIZADO ' + pad(now.getHours()) + ':' + pad(now.getMinutes());
+          el('weather-updated').innerHTML = 'PUEBLA · ACTUALIZADO ' + pad(mxNow.hour) + ':' + pad(mxNow.minute);
         } catch (e) {
           el('weather-updated').innerHTML = 'PUEBLA · ERROR DE CLIMA';
         }
